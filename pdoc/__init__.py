@@ -194,10 +194,16 @@ In general, we recommend keeping the following conventions:
 - If you want to document a special `__dunder__` method, the recommended way to do so is
   to not document the dunder method specifically, but to add some usage examples in the class documentation.
 
+> [!NOTE]
+> Hiding an item only removes it from documentation.
+> It is still displayed in the source code when clicking the "View Source" button.
+
 As a last resort, you can override pdoc's behavior with a custom module template (see
 [*How can I edit pdoc's HTML template?*](#edit-pdocs-html-template)).
 You can find an example at
 [`examples/custom-template/module.html.jinja2`](https://github.com/mitmproxy/pdoc/blob/main/examples/custom-template/module.html.jinja2).
+
+Hiding an item only removes it from documentation. It is still displayed in the source code when clicking the "View Source" button.
 
 ## ...exclude submodules from being documented?
 
@@ -475,7 +481,7 @@ You can find an example in [`examples/library-usage`](https://github.com/mitmpro
 from __future__ import annotations
 
 __docformat__ = "markdown"  # explicitly disable rST processing in the examples above.
-__version__ = "14.5.1"  # this is read from setup.py
+__version__ = "14.6.0"  # this is read from setup.py
 
 from pathlib import Path
 from typing import overload
