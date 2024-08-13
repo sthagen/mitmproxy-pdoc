@@ -4,6 +4,12 @@
 
 ## Unreleased: pdoc next
 
+- Fix a bug where entire modules would be excluded by `--no-include-undocumented`.
+  To exclude modules, see https://pdoc.dev/docs/pdoc.html#exclude-submodules-from-being-documented.
+  ([#728](https://github.com/mitmproxy/pdoc/pull/728), @mhils)
+- Fix a bug where subclasses of TypedDict subclasses would not render correctly.
+  ([#729](https://github.com/mitmproxy/pdoc/pull/729), @mhils)
+
 ## 2024-07-24: pdoc 14.6.0
 
 - If `example.data.Data` is also exposed as `example.Data`, pdoc now links to `example.Data` in documentation.
