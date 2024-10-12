@@ -5,6 +5,18 @@
 ## Unreleased: pdoc next
 
 
+## 2024-10-11: pdoc 15.0.0
+
+- Remove support for Python 3.8, which has reached end-of-life on 2024-10-07.
+  ([#747](https://github.com/mitmproxy/pdoc/pull/747), @mhils)
+- Inherited members are now hidden by default if the base class is not part of the documentation.
+  Please provide feedback in the PR if you relied on the old behavior.
+  ([#748](https://github.com/mitmproxy/pdoc/pull/748), @mhils)
+- Python 3.13: `@deprecated` decorators are now rendered with visual emphasis.
+  ([#750](https://github.com/mitmproxy/pdoc/pull/750), @mhils)
+- Improve mocking of `sys.stdin`, `sys.stdout`, and `sys.stderr` to fix runtime errors with some packages.
+  ([#751](https://github.com/mitmproxy/pdoc/pull/751), @mhils)
+
 ## 2024-09-11: pdoc 14.7.0
 
 - Do not shorten `current_module.func` to `func` in docstrings when linking.
