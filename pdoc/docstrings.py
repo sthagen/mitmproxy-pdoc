@@ -24,6 +24,13 @@ from textwrap import dedent
 from textwrap import indent
 import warnings
 
+AnyException = (SystemExit, GeneratorExit, Exception)
+"""BaseException, but excluding KeyboardInterrupt.
+
+Modules may raise SystemExit on import (which we want to catch),
+but we don't want to catch a user's KeyboardInterrupt.
+"""
+
 
 @cache
 def convert(docstring: str, docformat: str, source_file: Path | None) -> str:
@@ -32,39 +39,52 @@ def convert(docstring: str, docformat: str, source_file: Path | None) -> str:
     """
     docformat = docformat.lower()
 
-    if any(x in docformat for x in ["google", "numpy", "restructuredtext"]):
-        docstring = rst(docstring, source_file)
+    try:
+        if any(x in docformat for x in ["google", "numpy", "restructuredtext"]):
+            docstring = rst(docstring, source_file)
 
-    if "google" in docformat:
-        docstring = google(docstring)
+        if "google" in docformat:
+            docstring = google(docstring)
 
-    if "numpy" in docformat:
-        docstring = numpy(docstring)
+        if "numpy" in docformat:
+            docstring = numpy(docstring)
 
-    if source_file is not None and os.environ.get("PDOC_EMBED_IMAGES") != "0":
-        docstring = embed_images(docstring, source_file)
+        if source_file is not None and os.environ.get("PDOC_EMBED_IMAGES") != "0":
+            docstring = embed_images(docstring, source_file)
+
+    except AnyException as e:
+        raise RuntimeError(
+            'Docstring processing failed for docstring=\n"""\n'
+            + docstring
+            + f'\n"""\n{source_file=}\n{docformat=}'
+        ) from e
 
     return docstring
 
 
 def embed_images(docstring: str, source_file: Path) -> str:
+    def local_image_to_data_uri(href: str) -> str:
+        image_path = source_file.parent / href
+        image_data = image_path.read_bytes()
+        image_mime = mimetypes.guess_type(image_path)[0]
+        image_data_b64 = base64.b64encode(image_data).decode()
+        return f"data:{image_mime};base64,{image_data_b64}"
+
     def embed_local_image(m: re.Match) -> str:
-        image_path = source_file.parent / m["href"]
         try:
-            image_data = image_path.read_bytes()
-            image_mime = mimetypes.guess_type(image_path)[0]
+            href = local_image_to_data_uri(m["href"])
         except Exception:
             return m[0]
         else:
-            data = base64.b64encode(image_data).decode()
-            return f"![{m['alt']}](data:{image_mime};base64,{data})"
+            return m["before"] + href + m["after"]
 
-    return re.sub(
-        r"!\[\s*(?P<alt>.*?)\s*]\(\s*(?P<href>.+?)\s*\)",
-        embed_local_image,
-        docstring,
-    )
-    # TODO: Could probably do more here, e.g. support rST or raw HTML replacements.
+    # TODO: Could probably do more here, e.g. support rST replacements.
+    for regex in [
+        r"(?P<before>!\[\s*.*?\s*]\(\s*)(?P<href>.+?)(?P<after>\s*\))",
+        r"""(?P<before>src=['"])(?P<href>.+?)(?P<after>['"])""",
+    ]:
+        docstring = re.sub(regex, embed_local_image, docstring)
+    return docstring
 
 
 def google(docstring: str) -> str:
@@ -178,12 +198,14 @@ def numpy(docstring: str) -> str:
     )
     contents = sections[0]
     for heading, content in zip(sections[1::2], sections[2::2]):
-        if content.startswith(" "):
+        if content.startswith(" ") and re.search(r"\n(?![ \n])", content):
             # If the first line of section content is indented, we consider the section to be finished
             # on the first non-indented line. We take out the rest - the tail - here.
             content, tail = re.split(r"\n(?![ \n])", content, maxsplit=1)
         else:
             tail = ""
+
+        content = dedent(content)
 
         if heading in (
             "Parameters",
@@ -199,7 +221,7 @@ def numpy(docstring: str) -> str:
         elif heading == "See Also":
             contents += f"###### {heading}\n{_numpy_seealso(content)}"
         else:
-            contents += f"###### {heading}\n{dedent(content)}"
+            contents += f"###### {heading}\n{content}"
         contents += tail
     return contents
 
