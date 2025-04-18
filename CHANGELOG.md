@@ -4,8 +4,13 @@
 
 ## Unreleased: pdoc next
 
+
+## 2025-04-17: pdoc 15.0.2
+
+- Fix a bug where type aliases wouldn't be linked.
+  ([#798](https://github.com/mitmproxy/pdoc/pull/798), @mhils)
 - Fix a bug where invalid Numpydoc docstrings would raise an exception.
-  ([#789](https://github.com/mitmproxy/pdoc/pull/789), @mhils)
+  ([#789](https://github.com/mitmproxy/pdoc/pull/789), @tobiscode, @mhils)
 - Improve debuggability of docstring processing
   ([#784](https://github.com/mitmproxy/pdoc/pull/784), @tobiscode)
 - Fix handling of URL-escaped module names
