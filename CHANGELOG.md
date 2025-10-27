@@ -4,6 +4,9 @@
 
 ## Unreleased: pdoc next
 
+
+## 2025-10-27: pdoc 16.0.0
+
 - pdoc has a new logo. 🐍
   ([#838](https://github.com/mitmproxy/pdoc/pull/838), @mhils)
 - Add support for Python 3.14.
@@ -17,6 +20,9 @@
   upstream](https://github.com/trentm/python-markdown2)
 - Add support for keyword args for Google flavor docs.
   ([#840](https://github.com/mitmproxy/pdoc/pull/840), @aleksslitvinovs)
+- Add support for Pydantic-style field docstrings,
+  e.g. `pydantic.Field(description="...")`
+  ([#802](https://github.com/mitmproxy/pdoc/pull/802), @jinnovation)
 
 ## 2025-06-04: pdoc 15.0.4
 

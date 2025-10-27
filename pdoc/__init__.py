@@ -260,6 +260,25 @@ pdoc only interprets a subset of the reStructuredText specification.
 Adding additional syntax elements is usually easy. If you feel that pdoc doesn't parse a docstring element properly,
 please amend `pdoc.docstrings` and send us a pull request!
 
+## ...document Pydantic models?
+
+For [Pydantic models](https://docs.pydantic.dev/latest/concepts/models/), pdoc
+will extract [field](https://docs.pydantic.dev/latest/concepts/fields/)
+descriptions and treat them just like [documented
+variables](#document-variables). For example, the following two Pydantic models
+would have identical pdoc-rendered documentation:
+
+```python
+from pydantic import BaseModel, Field
+
+class Foo(BaseModel):
+    a: int = Field(description="Docs for field a.")
+
+class OtherFoo(BaseModel):
+    a: int
+    """Docs for field a."""
+
+```
 
 ## ...render math formulas?
 
@@ -481,7 +500,7 @@ You can find an example in [`examples/library-usage`](https://github.com/mitmpro
 from __future__ import annotations
 
 __docformat__ = "markdown"  # explicitly disable rST processing in the examples above.
-__version__ = "15.0.4"  # this is read from setup.py
+__version__ = "16.0.0"  # this is read from setup.py
 
 from pathlib import Path
 from typing import overload
